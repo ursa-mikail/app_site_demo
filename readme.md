@@ -1,3 +1,13 @@
+# Simple frontend-backend app
+Given the dir struct and files, i.e. {frontend, backend} with files, we present 4 versions:
+
+1. All typescript
+2. backend golang
+3. backend rust
+4. backend C
+
+The package also demo how to to run it. 
+
 ## How Frontend Interfaces with Go Backend - Key Lines
 
 ```
