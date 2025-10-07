@@ -1,10 +1,11 @@
 # Simple frontend-backend app
-Given the dir struct and files, i.e. {frontend, backend} with files, we present 4 versions:
+Given the dir struct and files, i.e. {frontend, backend} with files, we present 5 versions:
 
 1. All typescript
 2. backend golang
 3. backend rust
 4. backend C
+5. backend python
 
 The package also demo how to to run it. 
 
@@ -134,5 +135,41 @@ Lines 71-89: handle_get_user(id) - Returns single user
 
 The CORS headers (main.c lines 11-16) are what enable the connection. The C server uses libmicrohttpd for HTTP and json-c to create JSON responses that JavaScript can parse!
 
+
+-----
+
+## How Frontend Interfaces with Python Backend - Key Lines
+
+```
+Frontend → Backend Communication:
+
+frontend/src/api.ts (Lines 1, 4)
+  Line 1: API_BASE_URL = 'http://localhost:8000' ← Points to Python backend
+  Line 4: fetch(`${API_BASE_URL}/api/health`)    ← Makes HTTP request to Python
+
+frontend/src/App.tsx (Lines 8-10)
+  Line 9: fetchHealth() ← Calls Python's /api/health endpoint
+```
+
+## Backend → Frontend Response:
+
+```
+backend/app/main.py (Lines 7-15)
+  Lines 7-15: CORS middleware ← CRITICAL! Allows frontend (port 3000) to talk to backend (port 8000)
+  Line 10: allow_origins=["http://localhost:3000"] - Specifically allows your frontend
+  Lines 11-13: Allows all methods and headers for API communication
+  
+  The CORS headers (main.py lines 7-15) are what enable the connection. The Python server uses 
+  FastAPI/Uvicorn for HTTP and Pydantic to create JSON responses that JavaScript can parse!
+
+backend/app/main.py (Handler Functions)
+  Lines 17-26: root() - Returns JSON welcome message with available endpoints
+  Lines 28-33: health_check() - Returns JSON to frontend's fetchHealth() call
+  Line 20 & 30: return {...} - FastAPI automatically converts Python dicts to JSON for frontend
+
+backend/app/models.py (Lines 1-10)
+  Lines 4-6: HealthResponse model - Pydantic validates response structure
+  Lines 8-10: WelcomeResponse model - Type-safe response with endpoints dict
+```
 
 -----
